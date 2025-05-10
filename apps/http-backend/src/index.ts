@@ -3,7 +3,7 @@ import { SignInTypes, SignUpTypes } from "@repo/types/types";
 import { compare, hash } from "bcryptjs";
 import { sign } from "jsonwebtoken";
 import { middleware } from "./middleware";
-import prisma from "@repo/db/db";
+import { prisma } from "@repo/db/db";
 
 const app = express();
 const PORT = 5000;

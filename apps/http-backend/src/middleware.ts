@@ -1,8 +1,11 @@
 import { NextFunction, Request, Response } from "express";
-import { verify, JwtPayload } from "jsonwebtoken";
+import { verify } from "jsonwebtoken";
 
 interface AuthenticatedRequest extends Request {
-  user?: string | JwtPayload;
+  user?: {
+    userId: string;
+    userEmail: string;
+  };
 }
 
 export const middleware = async (
@@ -18,9 +21,14 @@ export const middleware = async (
   }
 
   try {
-    const decoded = verify(token, process.env.JWT_SECRET!);
-    req.user = decoded;
-    next();
+    const decoded = verify(token, process.env.JWT_SECRET!) as {
+      userId: string;
+      userEmail: string;
+    };
+    if (decoded.userId && decoded.userEmail) {
+      req.user = decoded;
+      next();
+    }
   } catch (error) {
     res.status(401).json({ message: "Invalid or expired token." });
   }
