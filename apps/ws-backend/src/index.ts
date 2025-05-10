@@ -5,6 +5,13 @@ import { JWT_SECRET } from "@repo/types/types";
 const PORT = 8080;
 const wss = new WebSocketServer({ port: PORT });
 
+interface User {
+  roomId: string;
+
+}
+
+const clients = []
+
 wss.on("connection", async (ws, req) => {
   const url = req.url;
   if (!url) {
@@ -32,7 +39,21 @@ wss.on("connection", async (ws, req) => {
   ws.on("error", (e) => console.log(e));
 
   ws.on("message", (e) => {
-    console.log(e.toString());
+    if (typeof e.toString() === "string") {
+      ws.close();
+      return;
+    }
+
+    const parsedMessage = JSON.parse(e.toString());
+
+    if (parsedMessage.type === "JOIN") {
+    }
+
+    if (parsedMessage.type === "CREATE") {
+    }
+
+    if (parsedMessage.type === "CHAT") {
+    }
   });
 
   ws.send("hello in the starting");

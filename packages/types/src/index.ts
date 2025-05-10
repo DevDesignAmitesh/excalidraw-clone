@@ -20,6 +20,7 @@ export const SignInTypes = z.object({
 
 export const CreateRoomTypes = z.object({
   name: z.string().min(4, "name is too short").max(20, "name is too long"),
+  slug: z.string().min(4, "slug is too short").max(20, "slug is too long"),
 });
 
 export const JWT_SECRET = process.env.JWT_SECRET;
