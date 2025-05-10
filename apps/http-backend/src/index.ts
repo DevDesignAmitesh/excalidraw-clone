@@ -2,8 +2,8 @@ import express, { Request, Response } from "express";
 import { SignInTypes, SignUpTypes } from "@repo/types/types";
 import { compare, hash } from "bcryptjs";
 import { sign } from "jsonwebtoken";
-import { JWT_SECRET } from "@repo/env/envs";
 import { middleware } from "./middleware";
+import prisma from "@repo/db/db";
 
 const app = express();
 const PORT = 5000;
@@ -62,7 +62,7 @@ app.post("/signin", async (req: Request, res: Response): Promise<any> => {
 
   const token = sign(
     { userId: isUserExist.id, userEmail: isUserExist.email },
-    JWT_SECRET!
+    process.env.JWT_SECRET!
   );
 
   res.cookie("token", token, {

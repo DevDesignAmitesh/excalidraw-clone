@@ -1,5 +1,5 @@
 {
-  "name": "http-backend",
+  "name": "@repo/db",
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
@@ -8,19 +8,18 @@
     "start": "node dist/index.js"
   },
   "dependencies": {
-    "@repo/types": "workspace:*",
-    "@repo/db": "workspace:*",
+    "@prisma/client": "6.7.0",
     "@repo/typescript-config": "workspace:*",
-    "@types/express": "^5.0.1",
-    "bcryptjs": "^3.0.2",
-    "express": "^5.1.0",
-    "jsonwebtoken": "^9.0.2"
+    "prisma": "^6.7.0"
+  },
+  "exports": {
+    "./db": "./dist/index.js"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "description": "",
   "devDependencies": {
-    "@types/jsonwebtoken": "^9.0.9"
+    "@types/node": "^22.15.3"
   }
 }
