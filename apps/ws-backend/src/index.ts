@@ -1,5 +1,6 @@
 import { verify } from "jsonwebtoken";
-import { WebSocket, WebSocketServer } from "ws";
+import { WebSocketServer } from "ws";
+import { JWT_SECRET } from "@repo/types/types";
 
 const PORT = 8080;
 const wss = new WebSocketServer({ port: PORT });
@@ -19,7 +20,7 @@ wss.on("connection", async (ws, req) => {
     return;
   }
 
-  const decoded = verify(token, process.env.JWT_SECRET!) as {
+  const decoded = verify(token, JWT_SECRET!) as {
     userId: string;
     userEmail: string;
   };

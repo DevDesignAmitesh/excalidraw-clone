@@ -1,3 +1,4 @@
+import { JWT_SECRET } from "@repo/types/types";
 import { NextFunction, Request, Response } from "express";
 import { verify } from "jsonwebtoken";
 
@@ -21,7 +22,7 @@ export const middleware = async (
   }
 
   try {
-    const decoded = verify(token, process.env.JWT_SECRET!) as {
+    const decoded = verify(token, JWT_SECRET!) as {
       userId: string;
       userEmail: string;
     };

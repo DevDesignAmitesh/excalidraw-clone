@@ -1,5 +1,5 @@
 import express, { Request, Response } from "express";
-import { SignInTypes, SignUpTypes } from "@repo/types/types";
+import { JWT_SECRET, SignInTypes, SignUpTypes } from "@repo/types/types";
 import { compare, hash } from "bcryptjs";
 import { sign } from "jsonwebtoken";
 import { middleware } from "./middleware";
@@ -62,7 +62,7 @@ app.post("/signin", async (req: Request, res: Response): Promise<any> => {
 
   const token = sign(
     { userId: isUserExist.id, userEmail: isUserExist.email },
-    process.env.JWT_SECRET!
+    JWT_SECRET!
   );
 
   res.cookie("token", token, {

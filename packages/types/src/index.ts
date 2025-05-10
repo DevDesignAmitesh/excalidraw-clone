@@ -10,3 +10,5 @@ export const SignInTypes = z.object({
   email: z.string().min(4).email("this is not a valid email"),
   password: z.string().min(5, "password is to short"),
 });
+
+export const JWT_SECRET = process.env.JWT_SECRET;
