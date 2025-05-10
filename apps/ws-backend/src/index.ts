@@ -1,16 +1,33 @@
 import { verify } from "jsonwebtoken";
-import { WebSocketServer } from "ws";
+import { WebSocket, WebSocketServer } from "ws";
 import { JWT_SECRET } from "@repo/types/types";
 
 const PORT = 8080;
 const wss = new WebSocketServer({ port: PORT });
 
-interface User {
-  roomId: string;
+const checkUserAuth = (
+  token: string
+): null | { userId: string; userEmail: string } => {
+  const decoded = verify(token, JWT_SECRET!) as {
+    userId: string;
+    userEmail: string;
+  };
 
+  if (!decoded.userEmail || !decoded.userId) {
+    return null;
+  }
+  return decoded;
+};
+
+// null | {userId: string userEmail: string}
+
+interface User {
+  userId: string;
+  rooms: string[];
+  ws: WebSocket;
 }
 
-const clients = []
+const users: User[] = [];
 
 wss.on("connection", async (ws, req) => {
   const url = req.url;
@@ -23,19 +40,22 @@ wss.on("connection", async (ws, req) => {
   const token = queryParam.get("token");
 
   if (!token) {
+    return ws.close();
+  }
+
+  const user = checkUserAuth(token);
+
+  if (!user) {
     ws.close();
     return;
   }
 
-  const decoded = verify(token, JWT_SECRET!) as {
-    userId: string;
-    userEmail: string;
-  };
+  users.push({
+    userId: user.userId,
+    rooms: [],
+    ws,
+  });
 
-  if (!decoded.userEmail || !decoded.userId) {
-    ws.close();
-    return;
-  }
   ws.on("error", (e) => console.log(e));
 
   ws.on("message", (e) => {
@@ -46,15 +66,32 @@ wss.on("connection", async (ws, req) => {
 
     const parsedMessage = JSON.parse(e.toString());
 
-    if (parsedMessage.type === "JOIN") {
+    if (parsedMessage.type === "join_room") {
+      const user = users.find((x) => x.ws === ws);
+      user?.rooms.push(parsedMessage.roomId);
     }
 
-    if (parsedMessage.type === "CREATE") {
+    if (parsedMessage.type === "leave_room") {
+      const user = users.find((x) => x.ws === ws);
+      if (!user) {
+        return;
+      }
+      user.rooms = user?.rooms.filter((x) => x !== parsedMessage.roomId);
     }
 
-    if (parsedMessage.type === "CHAT") {
+    if (parsedMessage.type === "chat") {
+      const { message, roomId } = parsedMessage;
+      users.forEach((user) => {
+        if (user.rooms.includes(roomId)) {
+          user.ws.send(
+            JSON.stringify({
+              type: "chat",
+              message,
+              roomId,
+            })
+          );
+        }
+      });
     }
   });
-
-  ws.send("hello in the starting");
 });

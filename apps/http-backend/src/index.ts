@@ -117,22 +117,23 @@ app.post(
 
 app.get("/chats/:roomId", async (req: Request, res: Response): Promise<any> => {
   try {
-    const roomId = req.params.roomId;
+    const roomId = Number(req.params.roomId);
 
     if (!roomId) {
       return res.json({ message: "room id not found" }).status(404);
     }
 
-    const room = await prisma.room.findUnique({
+    const chats = await prisma.chat.findMany({
       where: {
-        id: parseInt(roomId),
+        roomId,
       },
-      include: {
-        chats: true,
+      orderBy: {
+        id: "desc",
       },
+      take: 50,
     });
 
-    return { message: "room found with chats", room };
+    return { message: "chats found", chat: chats };
   } catch (error) {
     console.error((error as Error).message);
     return res.status(500).json({ message: "Internal server error" });
