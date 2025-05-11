@@ -1,4 +1,6 @@
 import z from "zod";
+import { config } from "dotenv";
+config();
 
 export const SignUpTypes = z.object({
   name: z.string().min(3, "name it too short").max(20, "name is too long"),

@@ -9,6 +9,8 @@ import { compare, hash } from "bcryptjs";
 import { sign } from "jsonwebtoken";
 import { middleware } from "./middleware";
 import { prisma } from "@repo/db/db";
+import { config } from "dotenv";
+config();
 
 const app = express();
 const PORT = 5000;
@@ -68,22 +70,11 @@ app.post("/signin", async (req: Request, res: Response): Promise<any> => {
       return res.json({ message: "wrong password" }).status(400);
     }
 
-    const token = sign(
-      { userId: isUserExist.id, userEmail: isUserExist.email },
-      JWT_SECRET!
-    );
+    const token = sign({ userId: isUserExist.id }, JWT_SECRET!);
 
-    res.cookie("token", token, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "none",
-      maxAge: 1000 * 60 * 60 * 24 * 7, // 7 days
-      path: "/",
-    });
-
-    return res.json({ message: "user signin successfull" }).status(201);
+    return res.json({ message: "user signin successfull", token }).status(201);
   } catch (error) {
-    console.error((error as Error).message);
+    console.error(error as Error);
     return res.status(500).json({ message: "Internal server error" });
   }
 });
@@ -107,7 +98,10 @@ app.post(
         },
       });
 
-      return res.json({ message: "room created successfully", room: newRoom });
+      return res.json({
+        message: "room created successfully",
+        roomId: newRoom.id,
+      });
     } catch (error) {
       console.error((error as Error).message);
       return res.status(500).json({ message: "Internal server error" });
