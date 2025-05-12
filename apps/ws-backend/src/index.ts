@@ -89,7 +89,7 @@ wss.on("connection", async (ws, req) => {
         },
       });
       users.forEach((user) => {
-        if (user.rooms.includes(roomId)) {
+        if (user.ws !== ws && user.rooms.includes(roomId)) {
           user.ws.send(
             JSON.stringify({
               type: "chat",

@@ -14,13 +14,14 @@ type Shapes =
       radius: number;
       x: number;
       y: number;
-    };
+    }
+  | { type: "line"; x1: number; y1: number; x2: number; y2: number };
 
 const existingShapes: Shapes[] = [];
 
 export const drawInit = (
   canvas: HTMLCanvasElement,
-  type: "rect" | "circle",
+  type: "rect" | "circle" | "line",
   socket: WebSocket
 ): (() => void) | void => {
   const ctx = canvas.getContext("2d");
@@ -48,6 +49,14 @@ export const drawInit = (
           x: finalShape.x,
           y: finalShape.y,
         });
+      } else if (finalShape.type === "line") {
+        existingShapes.push({
+          type: finalShape.type,
+          x1: finalShape.x1,
+          y1: finalShape.y1,
+          x2: finalShape.x2,
+          y2: finalShape.y2,
+        });
       }
 
       ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -70,6 +79,12 @@ export const drawInit = (
         ctx.arc(shape.x, shape.y, shape.radius, 0, 2 * Math.PI);
         ctx.stroke();
       }
+      if (shape.type === "line") {
+        ctx.beginPath();
+        ctx.moveTo(shape.x1, shape.y1);
+        ctx.lineTo(shape.x2, shape.y2);
+        ctx.stroke();
+      }
     });
   };
 
@@ -84,7 +99,11 @@ export const drawInit = (
           const parsed = JSON.parse(entry.message); // parses '{"shape":{...}}'
           const shape: Shapes = parsed.shape;
 
-          if (shape.type === "rect" || shape.type === "circle") {
+          if (
+            shape.type === "rect" ||
+            shape.type === "circle" ||
+            shape.type === "line"
+          ) {
             existingShapes.push(shape);
           }
         } catch (err) {
@@ -113,16 +132,20 @@ export const drawInit = (
 
   const handleMouseDown = (e: MouseEvent) => {
     clicked = true;
-    startX = e.clientX;
-    startY = e.clientY;
+    const rect = canvas.getBoundingClientRect();
+    startX = e.clientX - rect.left;
+    startY = e.clientY - rect.top;
   };
 
   const handleMouseUp = (e: MouseEvent) => {
     clicked = false;
-    const width = e.clientX - startX;
-    const height = e.clientY - startY;
+    const rect = canvas.getBoundingClientRect();
+    const endX = e.clientX - rect.left;
+    const endY = e.clientY - rect.top;
+    const width = endX - startX;
+    const height = endY - startY;
     const radius = Math.sqrt(
-      Math.pow(e.clientX - startX, 2) + Math.pow(e.clientY - startY, 2)
+      Math.pow(endX - startX, 2) + Math.pow(endY - startY, 2)
     );
 
     if (type === "rect") {
@@ -159,6 +182,30 @@ export const drawInit = (
           roomId: 1,
         })
       );
+    } else if (type === "line") {
+      const shape: Shapes = {
+        type: "line",
+        x1: startX,
+        y1: startY,
+        x2: endX,
+        y2: endY,
+      };
+
+      existingShapes.push(shape);
+
+      socket.send(
+        JSON.stringify({
+          type: "chat",
+          message: JSON.stringify({ shape }),
+          roomId: 1,
+        })
+      );
+
+      // Finalize the line
+      ctx.beginPath();
+      ctx.moveTo(startX, startY);
+      ctx.lineTo(endX, endY);
+      ctx.stroke();
     }
 
     ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -190,6 +237,17 @@ export const drawInit = (
         Math.pow(e.clientX - startX, 2) + Math.pow(e.clientY - startY, 2)
       );
       ctx.arc(startX, startY, radius, 0, 2 * Math.PI);
+      ctx.stroke();
+    }
+
+    if (type === "line") {
+      const rect = canvas.getBoundingClientRect();
+      const currentX = e.clientX - rect.left;
+      const currentY = e.clientY - rect.top;
+      ctx.moveTo(startX, startY);
+      ctx.lineTo(currentX, currentY);
+
+      // Draw the Path
       ctx.stroke();
     }
   };

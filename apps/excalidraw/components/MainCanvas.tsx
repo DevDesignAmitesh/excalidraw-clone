@@ -9,7 +9,7 @@ const MainCanvas = () => {
 
   useEffect(() => {
     const ws = new WebSocket(
-      `${WS_URL}?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiIwYTgwMmQxYy1hZDI5LTQxZjEtOWNlNi0zNDkzM2NjMGNlMmEiLCJpYXQiOjE3NDcwMjM1Mzh9.33oFB4hsOrstvJIA6fOM5rk1JiGdkk8TwHOKcalZanc`
+      `${WS_URL}?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJmNTQwMWU4NS05YzVmLTQ5NTctYjMwMy02ZTIyMzAwZTVlNTUiLCJpYXQiOjE3NDcwMzM2NTJ9.VKseXsXCPaPu9DBxrlRWW6UNv7UDmiaDkZunVnBs0v4`
     );
 
     ws.onopen = () => {

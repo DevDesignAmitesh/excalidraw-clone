@@ -1,20 +1,22 @@
 import { drawInit } from "@/draw";
 import React, { ReactElement, useEffect, useRef, useState } from "react";
 import { FaRegCircle, FaRegSquare } from "react-icons/fa";
+import { TfiLayoutLineSolid } from "react-icons/tfi";
 
 interface ShapesProps {
-  type: "rect" | "circle";
+  type: "rect" | "circle" | "line";
   icon: ReactElement;
 }
 
 const shapes: ShapesProps[] = [
   { type: "rect", icon: <FaRegSquare size={18} /> },
   { type: "circle", icon: <FaRegCircle size={18} /> },
+  { type: "line", icon: <TfiLayoutLineSolid size={18} /> },
 ];
 
 const Canvas = ({ socket }: { socket: WebSocket }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const [type, setType] = useState<"rect" | "circle">("rect");
+  const [type, setType] = useState<"rect" | "circle" | "line">("rect");
 
   useEffect(() => {
     console.log("ruuning");
