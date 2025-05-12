@@ -10,12 +10,14 @@ import { sign } from "jsonwebtoken";
 import { middleware } from "./middleware";
 import { prisma } from "@repo/db/db";
 import { config } from "dotenv";
-config();
+import cors from "cors";
 
 const app = express();
 const PORT = 5000;
+console.log(JWT_SECRET);
 
 app.use(express.json());
+app.use(cors());
 
 app.post("/signup", async (req: Request, res: Response): Promise<any> => {
   try {
@@ -112,10 +114,13 @@ app.post(
 app.get("/chats/:roomId", async (req: Request, res: Response): Promise<any> => {
   try {
     const roomId = Number(req.params.roomId);
+    console.log("hello in the backend ", roomId);
 
     if (!roomId) {
       return res.json({ message: "room id not found" }).status(404);
     }
+
+    console.log("oh yeaahh");
 
     const chats = await prisma.chat.findMany({
       where: {
@@ -127,7 +132,9 @@ app.get("/chats/:roomId", async (req: Request, res: Response): Promise<any> => {
       take: 50,
     });
 
-    return { message: "chats found", chat: chats };
+    console.log(chats);
+
+    return res.json({ message: "chats found", chat: chats }).status(201);
   } catch (error) {
     console.error((error as Error).message);
     return res.status(500).json({ message: "Internal server error" });

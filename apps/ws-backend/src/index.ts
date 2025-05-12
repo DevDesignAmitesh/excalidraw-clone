@@ -1,30 +1,27 @@
-import { verify } from "jsonwebtoken";
+import { JwtPayload, verify } from "jsonwebtoken";
 import { WebSocket, WebSocketServer } from "ws";
 import { JWT_SECRET } from "@repo/types/types";
 import { prisma } from "@repo/db/db";
+import { config } from "dotenv";
 
 const PORT = 8080;
 const wss = new WebSocketServer({ port: PORT });
 
-const checkUserAuth = (
-  token: string
-): null | { userId: string; userEmail: string } => {
-  const decoded = verify(token, JWT_SECRET!) as {
-    userId: string;
-    userEmail: string;
-  };
+console.log(JWT_SECRET);
 
-  if (!decoded.userEmail || !decoded.userId) {
+const checkUserAuth = (token: string): null | JwtPayload => {
+  console.log(JWT_SECRET);
+  const decoded = verify(token, JWT_SECRET) as JwtPayload;
+  console.log("decoded", decoded);
+  if (!decoded.userId) {
     return null;
   }
   return decoded;
 };
 
-// null | {userId: string userEmail: string}
-
 interface User {
   userId: string;
-  rooms: string[];
+  rooms: number[];
   ws: WebSocket;
 }
 
@@ -32,6 +29,7 @@ const users: User[] = [];
 
 wss.on("connection", async (ws, req) => {
   const url = req.url;
+  console.log("url", url);
   if (!url) {
     ws.close();
     return;
@@ -39,12 +37,15 @@ wss.on("connection", async (ws, req) => {
 
   const queryParam = new URLSearchParams(url.split("?")[1]);
   const token = queryParam.get("token");
+  console.log("token", token);
 
   if (!token) {
     return ws.close();
   }
 
   const user = checkUserAuth(token);
+
+  console.log("user", user);
 
   if (!user) {
     ws.close();
@@ -60,11 +61,9 @@ wss.on("connection", async (ws, req) => {
   ws.on("error", (e) => console.log(e));
 
   ws.on("message", async (e) => {
-    if (typeof e.toString() === "string") {
-      ws.close();
-      return;
-    }
     const parsedMessage = JSON.parse(e.toString());
+
+    console.log("parsedMessage", parsedMessage);
 
     if (parsedMessage.type === "join_room") {
       const user = users.find((x) => x.ws === ws);

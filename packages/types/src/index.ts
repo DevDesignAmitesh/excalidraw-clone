@@ -25,4 +25,4 @@ export const CreateRoomTypes = z.object({
   slug: z.string().min(4, "slug is too short").max(20, "slug is too long"),
 });
 
-export const JWT_SECRET = process.env.JWT_SECRET;
+export const JWT_SECRET = "JWT_SECRETudcif398f3iufwdcsx23y3948fy29ew8ch";

@@ -1,3 +1,6 @@
+import { BACKEND_URL } from "@/config";
+import axios from "axios";
+
 type Shapes =
   | {
       type: "rect";
@@ -17,15 +20,49 @@ const existingShapes: Shapes[] = [];
 
 export const drawInit = (
   canvas: HTMLCanvasElement,
-  type: "rect" | "circle"
+  type: "rect" | "circle",
+  socket: WebSocket
 ): (() => void) | void => {
   const ctx = canvas.getContext("2d");
   if (!ctx) return;
 
+  socket.onmessage = (event) => {
+    try {
+      const data = JSON.parse(event.data);
+      const shapes = JSON.parse(data.message);
+      const finalShape = shapes.shape;
+      console.log(shapes);
+      console.log(finalShape);
+      if (finalShape.type === "rect") {
+        existingShapes.push({
+          type: finalShape.type,
+          width: finalShape.width,
+          height: finalShape.height,
+          x: finalShape.x,
+          y: finalShape.y,
+        });
+      } else if (finalShape.type === "circle") {
+        existingShapes.push({
+          type: finalShape.type,
+          radius: finalShape.radius,
+          x: finalShape.x,
+          y: finalShape.y,
+        });
+      }
+
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx.fillStyle = "#121212";
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      drawAllShapes();
+    } catch (err) {
+      console.error("❌ Failed to parse WebSocket message:", err);
+    }
+  };
+
   const drawAllShapes = () => {
     existingShapes.map((shape) => {
-      ctx.strokeStyle = "#fff";
       ctx.beginPath();
+      ctx.strokeStyle = "#fff";
       if (shape.type === "rect") {
         ctx.strokeRect(shape.x, shape.y, shape.width, shape.height);
       }
@@ -35,6 +72,35 @@ export const drawInit = (
       }
     });
   };
+
+  const getAllShapes = async (): Promise<void> => {
+    try {
+      const res = await axios.get(`${BACKEND_URL}/chats/1`);
+      console.log("✅ hello");
+      const chatData = res.data.chat; // array of messages
+
+      chatData.forEach((entry: any) => {
+        try {
+          const parsed = JSON.parse(entry.message); // parses '{"shape":{...}}'
+          const shape: Shapes = parsed.shape;
+
+          if (shape.type === "rect" || shape.type === "circle") {
+            existingShapes.push(shape);
+          }
+        } catch (err) {
+          console.error("❌ Failed to parse shape:", err);
+        }
+      });
+
+      drawAllShapes();
+
+      console.log("🎯 Final shapes array:", existingShapes);
+    } catch (err) {
+      console.error("❌ Error fetching shapes:", err);
+    }
+  };
+
+  getAllShapes();
 
   ctx.clearRect(0, 0, canvas.width, canvas.height);
   ctx.fillStyle = "#121212";
@@ -60,20 +126,39 @@ export const drawInit = (
     );
 
     if (type === "rect") {
-      existingShapes.push({
+      const shape: Shapes = {
         type: "rect",
         width,
         height,
         x: startX,
         y: startY,
-      });
+      };
+
+      existingShapes.push(shape);
+
+      socket?.send(
+        JSON.stringify({
+          type: "chat",
+          message: JSON.stringify({ shape }),
+          roomId: 1,
+        })
+      );
     } else if (type === "circle") {
-      existingShapes.push({
+      const shape: Shapes = {
         type: "circle",
         radius,
         x: startX,
         y: startY,
-      });
+      };
+      existingShapes.push(shape);
+
+      socket.send(
+        JSON.stringify({
+          type: "chat",
+          message: JSON.stringify({ shape }),
+          roomId: 1,
+        })
+      );
     }
 
     ctx.clearRect(0, 0, canvas.width, canvas.height);

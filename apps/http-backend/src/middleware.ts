@@ -5,7 +5,6 @@ import { verify } from "jsonwebtoken";
 interface AuthenticatedRequest extends Request {
   user?: {
     userId: string;
-    userEmail: string;
   };
 }
 
@@ -14,7 +13,7 @@ export const middleware = async (
   res: Response,
   next: NextFunction
 ): Promise<any> => {
-  const token = req.cookies?.token;
+  const token = req.headers.authorization;
 
   if (!token) {
     res.status(401).json({ message: "Token not found. Unauthorized." });
@@ -24,9 +23,8 @@ export const middleware = async (
   try {
     const decoded = verify(token, JWT_SECRET!) as {
       userId: string;
-      userEmail: string;
     };
-    if (decoded.userId && decoded.userEmail) {
+    if (decoded.userId) {
       req.user = decoded;
       next();
     }
