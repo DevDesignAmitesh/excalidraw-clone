@@ -30,33 +30,10 @@ export const drawInit = (
   socket.onmessage = (event) => {
     try {
       const data = JSON.parse(event.data);
-      const shapes = JSON.parse(data.message);
-      const finalShape = shapes.shape;
-      console.log(shapes);
-      console.log(finalShape);
-      if (finalShape.type === "rect") {
-        existingShapes.push({
-          type: finalShape.type,
-          width: finalShape.width,
-          height: finalShape.height,
-          x: finalShape.x,
-          y: finalShape.y,
-        });
-      } else if (finalShape.type === "circle") {
-        existingShapes.push({
-          type: finalShape.type,
-          radius: finalShape.radius,
-          x: finalShape.x,
-          y: finalShape.y,
-        });
-      } else if (finalShape.type === "line") {
-        existingShapes.push({
-          type: finalShape.type,
-          x1: finalShape.x1,
-          y1: finalShape.y1,
-          x2: finalShape.x2,
-          y2: finalShape.y2,
-        });
+      if (data.type === "chat") {
+        const shapes = JSON.parse(data.message);
+        const finalShape = shapes.shape;
+        existingShapes.push(finalShape);
       }
 
       ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -238,6 +215,7 @@ export const drawInit = (
       );
       ctx.arc(startX, startY, radius, 0, 2 * Math.PI);
       ctx.stroke();
+      ctx.closePath();
     }
 
     if (type === "line") {

@@ -15,15 +15,12 @@ const MainCanvas = () => {
     ws.onopen = () => {
       setSocket(ws);
     };
-    setTimeout(() => {
-      console.log("sending");
-      ws.send(
-        JSON.stringify({
-          type: "join_room",
-          roomId: 1,
-        })
-      );
-    }, 2000);
+    ws.send(
+      JSON.stringify({
+        type: "join_room",
+        roomId: 1,
+      })
+    );
   }, []);
 
   if (!socket) {
