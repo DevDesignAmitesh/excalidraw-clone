@@ -1,8 +1,9 @@
-import MainCanvas from "@/components/MainCanvas";
 import React from "react";
 
 const page = () => {
-  return <MainCanvas />;
+  return (
+    <div className="w-full h-screen bg-black text-white">landign page</div>
+  );
 };
 
 export default page;

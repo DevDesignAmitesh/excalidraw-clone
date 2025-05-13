@@ -4,7 +4,7 @@ import React, { useEffect, useState } from "react";
 import Canvas from "@/components/Canvas";
 import { WS_URL } from "@/config";
 
-const MainCanvas = () => {
+const MainCanvas = ({ roomId }: { roomId: string }) => {
   const [socket, setSocket] = useState<WebSocket | null>(null);
 
   useEffect(() => {
@@ -26,7 +26,7 @@ const MainCanvas = () => {
   if (!socket) {
     return <div>connectig to server...</div>;
   }
-  return <Canvas socket={socket} />;
+  return <Canvas socket={socket} roomId={roomId} />;
 };
 
 export default MainCanvas;

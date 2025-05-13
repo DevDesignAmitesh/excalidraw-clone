@@ -1,4 +1,5 @@
 import { drawInit } from "@/draw";
+import { Game, Tools } from "@/draw/Game";
 import React, { ReactElement, useEffect, useRef, useState } from "react";
 import { FaRegCircle, FaRegSquare } from "react-icons/fa";
 import { TfiLayoutLineSolid } from "react-icons/tfi";
@@ -14,22 +15,25 @@ const shapes: ShapesProps[] = [
   { type: "line", icon: <TfiLayoutLineSolid size={18} /> },
 ];
 
-const Canvas = ({ socket }: { socket: WebSocket }) => {
+const Canvas = ({ socket, roomId }: { socket: WebSocket; roomId: string }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const [type, setType] = useState<"rect" | "circle" | "line">("rect");
+  const [type, setType] = useState<Tools>("rect");
+  const [game, setGame] = useState<Game | null>(null);
 
   useEffect(() => {
-    console.log("ruuning");
+    game?.setTools(type);
+  }, [type, game]);
+
+  useEffect(() => {
     if (canvasRef.current) {
-      const cleanup = drawInit(canvasRef.current, type, socket);
+      const g = new Game(canvasRef.current, socket, roomId);
+      setGame(g);
 
       return () => {
-        if (typeof cleanup === "function") {
-          cleanup();
-        }
+        g.destroy();
       };
     }
-  }, [canvasRef, type]);
+  }, [canvasRef]);
   return (
     <div className="relative min-h-screen w-full">
       <canvas

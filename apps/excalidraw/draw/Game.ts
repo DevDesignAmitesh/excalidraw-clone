@@ -56,6 +56,10 @@ export class Game {
     this.clearCanvas();
   }
 
+  setTools(tool: Tools) {
+    this.selectedTool = tool;
+  }
+
   initHandlers() {
     this.socket.onmessage = (event) => {
       try {
