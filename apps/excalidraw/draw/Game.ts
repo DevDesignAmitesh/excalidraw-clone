@@ -22,45 +22,48 @@ export class Game {
   private canvas: HTMLCanvasElement;
   private ctx: CanvasRenderingContext2D;
   private existingShapes: Shapes[];
-  private socket: WebSocket;
   private roomId: string;
+  private socket: WebSocket;
   public clicked: boolean;
   public startX: number;
   public startY: number;
   public selectedTool: Tools;
 
   constructor(canvas: HTMLCanvasElement, socket: WebSocket, roomId: string) {
+    console.log("Game constructor received roomId:", roomId);
     this.canvas = canvas;
-    this.ctx = canvas.getContext("2d")!;
-    this.init();
-    this.initHandlers();
-    this.initMouseHandlers();
-    this.existingShapes = [];
     this.roomId = roomId;
-    this.socket = socket;
     this.clicked = false;
+    this.selectedTool = "rect";
+    this.existingShapes = [];
     this.startX = 0;
     this.startY = 0;
-    this.selectedTool = "rect";
+    this.ctx = canvas.getContext("2d")!;
+    this.init();
+    this.socket = socket;
+    this.initHandlers();
+    this.initMouseHandlers();
   }
 
-  private clearCanvas() {
+  private clearCanvas = () => {
     this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
     this.ctx.fillStyle = "#121212";
     this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
-  }
+  };
 
-  async init() {
+  init = async () => {
+    console.log(this.roomId);
     this.existingShapes = (await getAllShapes(this.roomId)) ?? [];
 
     this.clearCanvas();
-  }
+    this.drawAllShapes();
+  };
 
-  setTools(tool: Tools) {
+  setTools = (tool: Tools) => {
     this.selectedTool = tool;
-  }
+  };
 
-  initHandlers() {
+  initHandlers = () => {
     this.socket.onmessage = (event) => {
       try {
         const data = JSON.parse(event.data);
@@ -71,13 +74,14 @@ export class Game {
         }
 
         this.clearCanvas();
+        this.drawAllShapes();
       } catch (err) {
         console.error("❌ Failed to parse WebSocket message:", err);
       }
     };
-  }
+  };
 
-  drawAllShapes() {
+  drawAllShapes = () => {
     this.existingShapes.map((shape) => {
       this.ctx.beginPath();
       this.ctx.strokeStyle = "#fff";
@@ -95,13 +99,14 @@ export class Game {
         this.ctx.stroke();
       }
     });
-  }
+  };
 
   handleMouseDown = (e: MouseEvent) => {
     this.clicked = true;
     const rect = this.canvas.getBoundingClientRect();
     this.startX = e.clientX - rect.left;
     this.startY = e.clientY - rect.top;
+    this.drawAllShapes();
   };
 
   handleMouseUp = (e: MouseEvent) => {
@@ -146,7 +151,7 @@ export class Game {
         JSON.stringify({
           type: "chat",
           message: JSON.stringify({ shape }),
-          roomId: 1,
+          roomId: this.roomId,
         })
       );
     } else if (this.selectedTool === "line") {
@@ -176,6 +181,7 @@ export class Game {
     }
 
     this.clearCanvas();
+    this.drawAllShapes();
   };
 
   handleMouseMove = (e: MouseEvent) => {
@@ -212,17 +218,18 @@ export class Game {
       // Draw the Path
       this.ctx.stroke();
     }
+    this.drawAllShapes();
   };
 
-  initMouseHandlers() {
+  initMouseHandlers = () => {
     this.canvas.addEventListener("mousedown", this.handleMouseDown);
     this.canvas.addEventListener("mouseup", this.handleMouseUp);
     this.canvas.addEventListener("mousemove", this.handleMouseMove);
-  }
+  };
 
-  destroy() {
+  destroy = () => {
     this.canvas.removeEventListener("mousedown", this.handleMouseDown);
     this.canvas.removeEventListener("mouseup", this.handleMouseUp);
     this.canvas.removeEventListener("mousemove", this.handleMouseMove);
-  }
+  };
 }

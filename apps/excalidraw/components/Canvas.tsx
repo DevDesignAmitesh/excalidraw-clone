@@ -1,4 +1,3 @@
-import { drawInit } from "@/draw";
 import { Game, Tools } from "@/draw/Game";
 import React, { ReactElement, useEffect, useRef, useState } from "react";
 import { FaRegCircle, FaRegSquare } from "react-icons/fa";
@@ -16,6 +15,7 @@ const shapes: ShapesProps[] = [
 ];
 
 const Canvas = ({ socket, roomId }: { socket: WebSocket; roomId: string }) => {
+  console.log(roomId, "in the cnavs")
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [type, setType] = useState<Tools>("rect");
   const [game, setGame] = useState<Game | null>(null);

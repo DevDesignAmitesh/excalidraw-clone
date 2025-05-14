@@ -8,24 +8,29 @@ const MainCanvas = ({ roomId }: { roomId: string }) => {
   const [socket, setSocket] = useState<WebSocket | null>(null);
 
   useEffect(() => {
-    const ws = new WebSocket(
-      `${WS_URL}?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJmNTQwMWU4NS05YzVmLTQ5NTctYjMwMy02ZTIyMzAwZTVlNTUiLCJpYXQiOjE3NDcwMzM2NTJ9.VKseXsXCPaPu9DBxrlRWW6UNv7UDmiaDkZunVnBs0v4`
-    );
+    // Only runs on client
+    const token = localStorage.getItem("token");
+    const ws = new WebSocket(`${WS_URL}?token=${token}`);
 
     ws.onopen = () => {
+      ws.send(
+        JSON.stringify({
+          type: "join_room",
+          roomId,
+        })
+      );
       setSocket(ws);
     };
-    ws.send(
-      JSON.stringify({
-        type: "join_room",
-        roomId: 1,
-      })
-    );
-  }, []);
+
+    return () => {
+      ws.close();
+    };
+  }, [roomId]); // run only once per roomId
 
   if (!socket) {
-    return <div>connectig to server...</div>;
+    return <div>connecting to server...</div>;
   }
+
   return <Canvas socket={socket} roomId={roomId} />;
 };
 

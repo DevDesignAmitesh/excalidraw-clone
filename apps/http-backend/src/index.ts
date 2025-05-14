@@ -9,7 +9,6 @@ import { compare, hash } from "bcryptjs";
 import { sign } from "jsonwebtoken";
 import { middleware } from "./middleware";
 import { prisma } from "@repo/db/db";
-import { config } from "dotenv";
 import cors from "cors";
 
 const app = express();
@@ -95,7 +94,7 @@ app.post(
 
       const newRoom = await prisma.room.create({
         data: {
-          ...result.data,
+          name: result.data.name,
           adminId,
         },
       });
@@ -113,6 +112,7 @@ app.post(
 
 app.get("/chats/:roomId", async (req: Request, res: Response): Promise<any> => {
   try {
+    console.log(req.params.roomId)
     const roomId = Number(req.params.roomId);
     console.log("hello in the backend ", roomId);
 
@@ -135,6 +135,16 @@ app.get("/chats/:roomId", async (req: Request, res: Response): Promise<any> => {
     console.log(chats);
 
     return res.json({ message: "chats found", chat: chats }).status(201);
+  } catch (error) {
+    console.error((error as Error).message);
+    return res.status(500).json({ message: "Internal server error" });
+  }
+});
+
+app.get("/rooms", async (_, res: Response): Promise<any> => {
+  try {
+    const rooms = await prisma.room.findMany();
+    return res.json({ message: "rooms found", rooms }).status(201);
   } catch (error) {
     console.error((error as Error).message);
     return res.status(500).json({ message: "Internal server error" });

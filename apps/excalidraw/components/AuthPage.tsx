@@ -33,7 +33,8 @@ const AuthPage = ({ isSignin }: { isSignin: boolean }) => {
     try {
       setLoading(true);
       const res = await axios.post(`${BACKEND_URL}/signin`, { ...formData });
-      if (res.status === 201) {
+      console.log(res);
+      if (res.status === 200) {
         alert(res.data.message);
         localStorage.setItem("token", res.data.token);
         router.push("/dashboard");
@@ -42,6 +43,8 @@ const AuthPage = ({ isSignin }: { isSignin: boolean }) => {
     } catch (error) {
       console.log(error);
       return;
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -76,7 +79,7 @@ const AuthPage = ({ isSignin }: { isSignin: boolean }) => {
             label="email"
             type="email"
             value={formData.email}
-            onChange={(e) => handleFormChange("name", e.target.value)}
+            onChange={(e) => handleFormChange("email", e.target.value)}
           />
           <InputBox
             label="password"
