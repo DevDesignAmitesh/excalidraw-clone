@@ -1,10 +1,11 @@
 import { Game, Tools } from "@/draw/Game";
 import React, { ReactElement, useEffect, useRef, useState } from "react";
 import { FaRegCircle, FaRegSquare } from "react-icons/fa";
+import { SlPencil } from "react-icons/sl";
 import { TfiLayoutLineSolid } from "react-icons/tfi";
 
 interface ShapesProps {
-  type: "rect" | "circle" | "line";
+  type: Tools;
   icon: ReactElement;
 }
 
@@ -12,6 +13,7 @@ const shapes: ShapesProps[] = [
   { type: "rect", icon: <FaRegSquare size={18} /> },
   { type: "circle", icon: <FaRegCircle size={18} /> },
   { type: "line", icon: <TfiLayoutLineSolid size={18} /> },
+  { type: "pencil", icon: <SlPencil size={18} /> },
 ];
 
 const Canvas = ({ socket, roomId }: { socket: WebSocket; roomId: string }) => {

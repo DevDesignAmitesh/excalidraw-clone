@@ -1,6 +1,6 @@
 import { getAllShapes } from "./http";
 
-export type Tools = "rect" | "circle" | "line";
+export type Tools = "rect" | "circle" | "line" | "pencil";
 
 export type Shapes =
   | {
@@ -16,7 +16,8 @@ export type Shapes =
       x: number;
       y: number;
     }
-  | { type: "line"; x1: number; y1: number; x2: number; y2: number };
+  | { type: "line"; x1: number; y1: number; x2: number; y2: number }
+  | { type: "pencil"; x1: number; y1: number };
 
 export class Game {
   private canvas: HTMLCanvasElement;
@@ -178,6 +179,7 @@ export class Game {
       this.ctx.moveTo(this.startX, this.startY);
       this.ctx.lineTo(endX, endY);
       this.ctx.stroke();
+    } else if (this.selectedTool === "pencil") {
     }
 
     this.clearCanvas();
@@ -196,9 +198,7 @@ export class Game {
       const width = e.clientX - this.startX;
       const height = e.clientY - this.startY;
       this.ctx.strokeRect(this.startX, this.startY, width, height);
-    }
-
-    if (this.selectedTool === "circle") {
+    } else if (this.selectedTool === "circle") {
       const radius = Math.sqrt(
         Math.pow(e.clientX - this.startX, 2) +
           Math.pow(e.clientY - this.startY, 2)
@@ -206,9 +206,7 @@ export class Game {
       this.ctx.arc(this.startX, this.startY, radius, 0, 2 * Math.PI);
       this.ctx.stroke();
       this.ctx.closePath();
-    }
-
-    if (this.selectedTool === "line") {
+    } else if (this.selectedTool === "line") {
       const rect = this.canvas.getBoundingClientRect();
       const currentX = e.clientX - rect.left;
       const currentY = e.clientY - rect.top;
