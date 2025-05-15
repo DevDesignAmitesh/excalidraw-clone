@@ -1,6 +1,7 @@
 import { theme } from "@/constant";
 import React from "react";
 import SuperBtn from "./SuperBtn";
+import Link from "next/link";
 
 const Hero = () => {
   return (
@@ -17,8 +18,13 @@ const Hero = () => {
       </p>
       <div className="w-full flex justify-center items-center gap-5 mt-6">
         {/* will add link here for keeping it server comp */}
-        <SuperBtn variant="red" label="get started" />
-        <SuperBtn variant="black" label="sign in" />
+
+        <Link href={"/signin"}>
+          <SuperBtn variant="black" label="sign in" />
+        </Link>
+        <Link href={"/signup"}>
+          <SuperBtn variant="red" label="get started" />
+        </Link>
       </div>
       <section className="w-full mt-14">
         <div className="max-w-4xl mx-auto text-center">

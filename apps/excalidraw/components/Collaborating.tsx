@@ -1,10 +1,11 @@
 import { theme } from "@/constant";
 import React from "react";
 import SuperBtn from "./SuperBtn";
+import Link from "next/link";
 
 const Collaborating = () => {
   return (
-    <div className="w-full flex justify-center items-center px-10 py-10 mt-20">
+    <div className="w-full flex justify-center items-center px-10 py-20 ">
       <div
         style={{ backgroundColor: theme.bg }}
         className="flex justify-center items-center flex-col p-10 rounded-md"
@@ -22,8 +23,13 @@ const Collaborating = () => {
           join thousands of teams who are already using excailsketch to bring
           their ideas to life
         </p>
-
-        <SuperBtn label="get started for free" variant="red" className="mt-5" />
+        <Link href={"/signup"}>
+          <SuperBtn
+            label="get started for free"
+            variant="red"
+            className="mt-5"
+          />
+        </Link>
       </div>
     </div>
   );
