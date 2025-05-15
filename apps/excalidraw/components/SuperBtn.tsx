@@ -8,6 +8,7 @@ interface buttonProps {
   label: string;
   onClick?: React.MouseEventHandler<HTMLButtonElement>;
   className?: string;
+  disabled?: boolean
 }
 
 const SuperBtn = ({
@@ -15,6 +16,7 @@ const SuperBtn = ({
   label,
   onClick,
   className,
+  disabled,
 }: buttonProps) => {
   const baseStyles = `font-medium capitalize py-2 px-4 rounded-md cursor-pointer hover:opacity-90`;
 
@@ -30,6 +32,7 @@ const SuperBtn = ({
 
   return (
     <button
+      disabled={disabled}
       style={{ ...variantStyles[variant] }}
       onClick={onClick}
       className={`${baseStyles} ${className}`}

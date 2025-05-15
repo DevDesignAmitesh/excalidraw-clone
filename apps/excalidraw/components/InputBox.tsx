@@ -1,3 +1,4 @@
+import { theme } from "@/constant";
 import React from "react";
 
 interface InputProps {
@@ -19,8 +20,9 @@ const InputBox = ({
     <div className="w-full flex flex-col justify-center items-start gap-2">
       {label && <h1 className="capitalize">{label}</h1>}
       <input
+        style={{ backgroundColor: theme.bg }}
         type={type}
-        className={`p-2 rounded-md border-2 border-neutral-500 w-full ${className}`}
+        className={`p-3 rounded-xl w-full ${className}`}
         placeholder={`Enter ${label}`}
         required
         value={value}

@@ -90,3 +90,28 @@ export const footerProps: FooterProps[] = [
     content: ["about", "blog", "contact"],
   },
 ];
+
+export interface roomsProps {
+  id: number;
+  name: string;
+  slug: string;
+  createdAt: string;
+  adminId: string;
+}
+
+export const rooms: roomsProps[] = [
+  {
+    id: 1,
+    name: "this is my room",
+    slug: "this-is-my-room",
+    createdAt: "date",
+    adminId: "admin",
+  },
+  {
+    id: 2,
+    name: "you waana fight with me",
+    slug: "you-waana-fight-with-me",
+    createdAt: "date",
+    adminId: "admin",
+  },
+];

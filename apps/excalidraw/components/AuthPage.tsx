@@ -2,10 +2,11 @@
 
 import React, { useState } from "react";
 import InputBox from "./InputBox";
-import Button from "./Button";
 import axios from "axios";
 import { BACKEND_URL } from "@/config";
 import { useRouter } from "next/navigation";
+import { theme } from "@/constant";
+import SuperBtn from "./SuperBtn";
 
 interface FormDataProps {
   name: string;
@@ -62,11 +63,18 @@ const AuthPage = ({ isSignin }: { isSignin: boolean }) => {
   };
 
   return (
-    <div className="w-full h-screen flex justify-center items-center bg-[#121212]">
-      <div className="rounded-md p-5 flex flex-col justify-center w-[400px] items-center gap-5 text-white">
-        <h1 className="text-2xl font-bold">
-          {isSignin ? "Signin" : "Register"}
-        </h1>
+    <div className="w-full h-fit flex justify-center items-center">
+      <div className="rounded-md p-6 mt-18 flex flex-col justify-center border border-neutral-600 w-[400px] items-center gap-5 text-white">
+        <div className="w-full flex flex-col justify-center items-center gap-2">
+          <h1 className="text-2xl font-bold capitalize">
+            {isSignin ? "welcome back" : "create account"}
+          </h1>
+          <h1 style={{ color: theme.gray }} className="text-[14px]">
+            {isSignin
+              ? "Enter your credentials to access your account"
+              : "Enter your info to create a new account"}
+          </h1>
+        </div>
         <div className="grid grid-cols-1 w-full place-items-center place-content-center gap-5">
           {!isSignin && (
             <InputBox
@@ -87,11 +95,25 @@ const AuthPage = ({ isSignin }: { isSignin: boolean }) => {
             value={formData.password}
             onChange={(e) => handleFormChange("password", e.target.value)}
           />
-          <Button
-            isSignin={isSignin}
+          <SuperBtn
             onClick={isSignin ? handleLogin : handleRegister}
-            loading={loading}
+            label={loading ? "Loading..." : isSignin ? "Register" : "Log In"}
+            variant="red"
+            className="w-full mt-2"
+            disabled={loading}
           />
+          <p style={{ color: theme.gray }} className="text-[14px]">
+            {isSignin ? "Don't have an account?" : "Already have an account?"} {" "}
+            <span
+              onClick={() =>
+                isSignin ? router.push("/signup") : router.push("/signin")
+              }
+              className="hover:underline cursor-pointer"
+              style={{ color: theme.orangeColor }}
+            >
+              {isSignin ? "Register" : "Log in"}
+            </span>
+          </p>
         </div>
       </div>
     </div>
