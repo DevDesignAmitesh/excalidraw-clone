@@ -18,7 +18,7 @@ const Dashboard = ({ rooms }: { rooms: roomsProps[] }) => {
         ) : (
           <div className="grid w-full grid-cols-4 gap-10">
             {rooms.map((room) => (
-              <Link key={room.id} href={`/canvas/${room.id.toString()}`}>
+              <Link key={room.id} href={`/canvas/${room.slug.toString()}`}>
                 <div className="flex w-full justify-center items-start flex-col rounded-md text-white overflow-hidden border border-neutral-600">
                   <div
                     style={{ backgroundColor: theme.bg }}

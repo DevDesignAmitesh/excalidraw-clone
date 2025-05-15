@@ -9,6 +9,7 @@ import { compare, hash } from "bcryptjs";
 import { sign } from "jsonwebtoken";
 import { middleware } from "./middleware";
 import { prisma } from "@repo/db/db";
+import { nanoid } from "nanoid";
 import cors from "cors";
 
 const app = express();
@@ -92,16 +93,19 @@ app.post(
         return res.status(400).json({ message: result.error.message });
       }
 
+      const uniqueId = nanoid(8);
+      const finalSlug = `${result.data.slug}-${uniqueId}`;
+
       const newRoom = await prisma.room.create({
         data: {
           name: result.data.name,
+          slug: finalSlug,
           adminId,
         },
       });
-
       return res.json({
         message: "room created successfully",
-        roomId: newRoom.id,
+        roomSlug: newRoom.slug,
       });
     } catch (error) {
       console.error((error as Error).message);
@@ -110,40 +114,50 @@ app.post(
   }
 );
 
-app.get("/chats/:roomId", async (req: Request, res: Response): Promise<any> => {
-  try {
-    console.log(req.params.roomId)
-    const roomId = Number(req.params.roomId);
-    console.log("hello in the backend ", roomId);
+app.get(
+  "/chats/:roomSlug",
+  async (req: Request, res: Response): Promise<any> => {
+    try {
+      console.log(req.params.roomSlug);
+      const roomSlug = req.params.roomSlug;
 
-    if (!roomId) {
-      return res.json({ message: "room id not found" }).status(404);
+      if (!roomSlug) {
+        return res.json({ message: "room id not found" }).status(404);
+      }
+
+      const room = await prisma.room.findUnique({
+        where: { slug: roomSlug },
+        include: {
+          chats: {
+            orderBy: {
+              id: "desc",
+            },
+            take: 100,
+          },
+        },
+      });
+
+      if (!room) {
+        return res.json({ message: "room not found" }).status(404);
+      }
+
+      const chats = room.chats;
+
+      return res.json({ message: "chats found", chat: chats }).status(201);
+    } catch (error) {
+      console.error((error as Error).message);
+      return res.status(500).json({ message: "Internal server error" });
     }
-
-    console.log("oh yeaahh");
-
-    const chats = await prisma.chat.findMany({
-      where: {
-        roomId,
-      },
-      orderBy: {
-        id: "desc",
-      },
-      take: 50,
-    });
-
-    console.log(chats);
-
-    return res.json({ message: "chats found", chat: chats }).status(201);
-  } catch (error) {
-    console.error((error as Error).message);
-    return res.status(500).json({ message: "Internal server error" });
   }
-});
+);
 
-app.get("/rooms", async (_, res: Response): Promise<any> => {
+app.get("/rooms", middleware, async (req: Request, res: Response): Promise<any> => {
   try {
-    const rooms = await prisma.room.findMany();
+    const userId = (req as any).user.userId;
+
+    const rooms = await prisma.room.findMany({
+      where: { adminId: userId },
+    });
     return res.json({ message: "rooms found", rooms }).status(201);
   } catch (error) {
     console.error((error as Error).message);

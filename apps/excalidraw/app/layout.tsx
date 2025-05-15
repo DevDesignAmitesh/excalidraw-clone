@@ -1,7 +1,5 @@
 import type { Metadata } from "next";
 import "./globals.css";
-import Header from "@/components/Header";
-import { theme } from "@/constant";
 
 export const metadata: Metadata = {
   title: "Create Next App",
@@ -15,10 +13,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className="px-10" style={{ backgroundColor: theme.black }}>
-        <Header />
-        {children}
-      </body>
+      <body>{children}</body>
     </html>
   );
 }

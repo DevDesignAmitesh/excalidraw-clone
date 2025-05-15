@@ -16,8 +16,14 @@ const shapes: ShapesProps[] = [
   { type: "pencil", icon: <SlPencil size={18} /> },
 ];
 
-const Canvas = ({ socket, roomId }: { socket: WebSocket; roomId: string }) => {
-  console.log(roomId, "in the cnavs")
+const Canvas = ({
+  socket,
+  roomSlug,
+}: {
+  socket: WebSocket;
+  roomSlug: string;
+}) => {
+  console.log(roomSlug, "in the cnavs");
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [type, setType] = useState<Tools>("rect");
   const [game, setGame] = useState<Game | null>(null);
@@ -28,7 +34,7 @@ const Canvas = ({ socket, roomId }: { socket: WebSocket; roomId: string }) => {
 
   useEffect(() => {
     if (canvasRef.current) {
-      const g = new Game(canvasRef.current, socket, roomId);
+      const g = new Game(canvasRef.current, socket, roomSlug);
       setGame(g);
 
       return () => {

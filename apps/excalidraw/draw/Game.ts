@@ -23,17 +23,17 @@ export class Game {
   private canvas: HTMLCanvasElement;
   private ctx: CanvasRenderingContext2D;
   private existingShapes: Shapes[];
-  private roomId: string;
+  private roomSlug: string;
   private socket: WebSocket;
   public clicked: boolean;
   public startX: number;
   public startY: number;
   public selectedTool: Tools;
 
-  constructor(canvas: HTMLCanvasElement, socket: WebSocket, roomId: string) {
-    console.log("Game constructor received roomId:", roomId);
+  constructor(canvas: HTMLCanvasElement, socket: WebSocket, roomSlug: string) {
+    console.log("Game constructor received roomSlug:", roomSlug);
     this.canvas = canvas;
-    this.roomId = roomId;
+    this.roomSlug = roomSlug;
     this.clicked = false;
     this.selectedTool = "rect";
     this.existingShapes = [];
@@ -53,8 +53,8 @@ export class Game {
   };
 
   init = async () => {
-    console.log(this.roomId);
-    this.existingShapes = (await getAllShapes(this.roomId)) ?? [];
+    console.log(this.roomSlug);
+    this.existingShapes = (await getAllShapes(this.roomSlug)) ?? [];
 
     this.clearCanvas();
     this.drawAllShapes();
@@ -136,7 +136,7 @@ export class Game {
         JSON.stringify({
           type: "chat",
           message: JSON.stringify({ shape }),
-          roomId: this.roomId,
+          roomSlug: this.roomSlug,
         })
       );
     } else if (this.selectedTool === "circle") {
@@ -152,7 +152,7 @@ export class Game {
         JSON.stringify({
           type: "chat",
           message: JSON.stringify({ shape }),
-          roomId: this.roomId,
+          roomSlug: this.roomSlug,
         })
       );
     } else if (this.selectedTool === "line") {
@@ -170,7 +170,7 @@ export class Game {
         JSON.stringify({
           type: "chat",
           message: JSON.stringify({ shape }),
-          roomId: this.roomId,
+          roomSlug: this.roomSlug,
         })
       );
 
